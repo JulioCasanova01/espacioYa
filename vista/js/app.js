@@ -8,6 +8,12 @@ let selectedTimeSlot = null
 let reservationToCancel = null
 let reservationToEdit = null
 
+
+
+
+
+
+
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
   initializeApp()

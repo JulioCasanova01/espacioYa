@@ -2,7 +2,7 @@
 function login($conn, $data) {
     session_start();
     $correo = $data['correo'];
-    $clave = $data['clave'];
+    $contrasena = $data['contrasena'];
 
     $stmt = $conn->prepare("SELECT * FROM usuarios WHERE correo = ?");
     $stmt->bind_param("s", $correo);
@@ -12,7 +12,7 @@ function login($conn, $data) {
     if ($resultado->num_rows === 1) {
         $row = $resultado->fetch_assoc();
 
-        if (password_verify($clave, $row['clave'])) {
+        if (password_verify($contrasena, $row['contrasena'])) {
             $_SESSION['id_usuario'] = $row['id'];
             $_SESSION['nombre'] = $row['nombre'];
             $_SESSION['correo'] = $row['correo'];
@@ -20,14 +20,14 @@ function login($conn, $data) {
 
             $nombre = addslashes($_SESSION["nombre"]);
             $rol = addslashes($_SESSION["rol"]);
-            $mensaje = "Bienvenido $nombre ($rol)";
+            $mensaje = "Bienvenido";
 
             echo "
                 <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
                 <script src='../vista/alertasweet/funcionesalert.js'></script>
                 <body>
                     <script>
-                        informar('$mensaje', 'ACEPTAR', '../vista/admin/vista_general.php', 'success');
+                        informar('$mensaje', 'ACEPTAR', '../vista/dashboard.php', 'success');
                     </script>
                 </body>";
             exit();
@@ -37,7 +37,7 @@ function login($conn, $data) {
                 <script src='../vista/alertasweet/funcionesalert.js'></script>
                 <body>
                     <script>
-                        informar('CLAVE INCORRECTA, Por favor, verifica tu contraseña.', 'REINTENTAR', '../vista/admin/login_admin.php', 'warning');
+                        informar('contrasena INCORRECTA, Por favor, verifica tu contraseña.', 'REINTENTAR', '../vista/index.php', 'warning');
                     </script>
                 </body>";
             exit();
@@ -48,7 +48,7 @@ function login($conn, $data) {
             <script src='../vista/alertasweet/funcionesalert.js'></script>
                 <body>
                     <script>
-                        informar('USUARIO NO ENCONTRADO', 'REINTENTAR', '../vista/admin/login_admin.php', 'error');
+                        informar('USUARIO NO ENCONTRADO', 'REINTENTAR', '../vista/index.php', 'error');
                     </script>
                 </body>";
         exit();
@@ -63,14 +63,69 @@ function salir(){
     exit();
 }
 
-function registrar($conn, $data) {
-    $clave_cifrada = password_hash($data['clave'], PASSWORD_DEFAULT);
-    $sql= "INSERT INTO usuarios VALUES (NULL, '{$data['nombre']}', '{$data['UserEmail']}', '{$data['rolUsuario']}', '{$data['contacto1']}', '{$data['contacto2']}', '$clave_cifrada')";
-    mysqli_query($conn, $sql);
-    $_SESSION['nombre'] = $data['nombre'];
-    $_SESSION['rol'] = $data['rolUsuario'];
 
-    header("Location: ../vista/admin/usuarios.php");
+
+
+function registrar($conn, $data) {
+   $contrasena_cifrada = password_hash($data['contrasena'], PASSWORD_DEFAULT);
+    $rol= $data['rol'] == '' ? 'usuario' : 'admin';
+    date_default_timezone_set('America/Bogota');
+    $fecha_registro= date('Y-m-d H:i:s');
+
+    $sql = "INSERT INTO usuarios 
+    VALUES (NULL, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Error al preparar la consulta: " . $conn->error);
+    }
+
+    $stmt->bind_param(
+        "ssssss",
+        $data['nombre'],
+        $data['correo'],
+        $contrasena_cifrada,
+        $rol,
+        $fecha_registro,
+        $data['telefono']
+    );
+
+    try {
+    if ($stmt->execute()) {
+        $_SESSION['nombre'] = $data['nombre'];
+        $_SESSION['rol'] = $rol;
+        
+        echo "
+        <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
+        <script src='../vista/alertasweet/funcionesalert.js'></script>
+        <body>
+                <script>
+                    informar('USUARIO REGISTRADO EXITÓSAMENTE.','Ok.', '../vista/index.php', 'success');
+                </script>
+        </body>";
+        
+        exit();
+    }
+    } catch (mysqli_sql_exception $e) {
+        // Verificamos si es error por duplicado
+        if ($e->getCode() === 1062) {
+            // die("Error: Ya existe un registro con este número de documento o correo electrónico.");
+            
+            echo "
+                <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
+                <script src='../vista/alertasweet/funcionesalert.js'></script>
+                <body>
+                        <script>
+                            informar('El Correo ya está registrado. Por favor, verifica los datos ingresados.','Ok.', '../vista/index.php', 'error');
+                        </script>
+                </body>";
+        } else {
+            die("Error al registrar cliente: " . $e->getMessage());
+        }
+        }
+
+
+    $stmt->close();
 }
 
 function obtenerUsuarios($conn) {
@@ -85,7 +140,7 @@ function eliminar($conn, $id) {
 }
 
 function actualizar($conn, $data) {
-    $sql = "UPDATE usuarios SET nombre='{$data['nombre']}', correo='{$data['UserEmail']}', rol='{$data['rolUsuario']}', contacto_1='{$data['contacto1']}', contacto_2='{$data['contacto2']}'  WHERE id={$data['id']}";
+    $sql = "UPDATE usuarios SET nombre='{$data['nombre']}', correo='{$data['correo']}', rol='{$data['rol']}', contacto_1='{$data['telefono']}', contacto_2='{$data['contacto2']}'  WHERE id={$data['id']}";
     mysqli_query($conn, $sql);
     header("Location: ../vista/admin/usuarios.php");
 }

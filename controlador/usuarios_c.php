@@ -1,6 +1,6 @@
 <?php
 include '../conexion.php';
-include '../modelo/usuarios.php'; 
+include '../modelo/usuarios_m.php'; 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : '';
 if ($accion == 'ingresar') {
     login($conn, $_POST);

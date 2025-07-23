@@ -29,22 +29,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html">
+                        <a class="nav-link" href="dashboard.php">
                             <i class="bi bi-house-door me-2"></i>Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="calendar.html">
+                        <a class="nav-link active" href="calendar.php">
                             <i class="bi bi-calendar3 me-2"></i>Calendario
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="reservations.html">
+                        <a class="nav-link" href="reservations.php">
                             <i class="bi bi-bookmark-check me-2"></i>Mis Reservas
                         </a>
                     </li>
                     <li class="nav-item" id="adminMenu" style="display: none;">
-                        <a class="nav-link" href="admin.html">
+                        <a class="nav-link" href="admin.php">
                             <i class="bi bi-gear me-2"></i>Administración
                         </a>
                     </li>

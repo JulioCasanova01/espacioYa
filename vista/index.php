@@ -44,16 +44,16 @@
                                 <p>Inicia sesión para continuar</p>
                             </div>
                             
-                            <form id="loginFormElement" class="modern-form">
+                            <form action="../controlador/usuarios_c.php?accion=ingresar" method="POST" id="loginFormElement" class="modern-form">
                                 <div class="form-floating mb-3">
-                                    <input type="email" class="form-control modern-input" id="loginEmail" placeholder="tu@email.com" required>
+                                    <input name="correo" type="email" class="form-control modern-input" id="loginEmail" placeholder="tu@email.com" required>
                                     <label for="loginEmail">
                                         <i class="bi bi-envelope me-2"></i>Email
                                     </label>
                                 </div>
                                 
                                 <div class="form-floating mb-4">
-                                    <input type="password" class="form-control modern-input" id="loginPassword" placeholder="Contraseña" required>
+                                    <input name="contrasena" type="password" class="form-control modern-input" id="loginPassword" placeholder="Contraseña" required>
                                     <label for="loginPassword">
                                         <i class="bi bi-lock me-2"></i>Contraseña
                                     </label>
@@ -66,8 +66,14 @@
                             </form>
                             
                             <div class="auth-switch text-center">
-                                <p>¿No tienes cuenta? <a href="#" id="showRegister" class="auth-link">Regístrate aquí</a></p>
+                                <p>
+                                    ¿No tienes cuenta? 
+                                    <a href="javascript:void(0);" onclick="mostrarRegistrar()" id="showRegister" class="auth-link">
+                                    Regístrate aquí
+                                    </a>
+                                </p>
                             </div>
+
                         </div>
 
                         <!-- Register Form -->
@@ -77,31 +83,37 @@
                                 <p>Únete a nuestra plataforma</p>
                             </div>
                             
-                            <form id="registerFormElement" class="modern-form">
+                            <form action="../controlador/usuarios_c.php?accion=registrar" method="POST" id="registerFormElement" class="modern-form">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control modern-input" id="registerName" placeholder="Nombre completo" required>
+                                    <input name="nombre" type="text" class="form-control modern-input" id="registerName" placeholder="Nombre completo" required>
                                     <label for="registerName">
                                         <i class="bi bi-person me-2"></i>Nombre Completo
                                     </label>
                                 </div>
                                 
                                 <div class="form-floating mb-3">
-                                    <input type="email" class="form-control modern-input" id="registerEmail" placeholder="tu@email.com" required>
+                                    <input name="correo" type="email" class="form-control modern-input" id="registerEmail" placeholder="tu@email.com" required>
                                     <label for="registerEmail">
                                         <i class="bi bi-envelope me-2"></i>Email
                                     </label>
                                 </div>
                                 
                                 <div class="form-floating mb-3">
-                                    <input type="password" class="form-control modern-input" id="registerPassword" placeholder="Contraseña" required>
+                                    <input name="contrasena" type="password" class="form-control modern-input" id="registerPassword" placeholder="Contraseña" required>
                                     <label for="registerPassword">
                                         <i class="bi bi-lock me-2"></i>Contraseña
                                     </label>
                                 </div>
                                 
                                 <div class="form-floating mb-4">
-                                    <input type="tel" class="form-control modern-input" id="registerPhone" placeholder="Teléfono" required>
+                                    <input name="telefono" type="tel" class="form-control modern-input" id="registerPhone" placeholder="Teléfono" required>
                                     <label for="registerPhone">
+                                        <i class="bi bi-phone me-2"></i>Teléfono
+                                    </label>
+                                </div>
+                                <div class="form-floating mb-4" style="display: none;">
+                                    <input name="rol" type="text" class="form-control modern-input" id="registerrol" placeholder="rol">
+                                    <label for="registerrol">
                                         <i class="bi bi-phone me-2"></i>Teléfono
                                     </label>
                                 </div>
@@ -113,7 +125,7 @@
                             </form>
                             
                             <div class="auth-switch text-center">
-                                <p>¿Ya tienes cuenta? <a href="#" id="showLogin" class="auth-link">Inicia sesión aquí</a></p>
+                                <p>¿Ya tienes cuenta? <a href="javascript:void(0);" onclick="mostrarLogin()" id="showLogin" class="auth-link">Inicia sesión aquí</a></p>
                             </div>
                         </div>
                     </div>
@@ -185,6 +197,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeAuth();
         });
+
+        function mostrarRegistrar() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+        function mostrarLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
     </script>
 </body>
 </html>

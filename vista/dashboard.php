@@ -29,22 +29,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.html">
+                        <a class="nav-link active" href="dashboard.php">
                             <i class="bi bi-house-door me-2"></i>Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="calendar.html">
+                        <a class="nav-link" href="calendar.php">
                             <i class="bi bi-calendar3 me-2"></i>Calendario
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="reservations.html">
+                        <a class="nav-link" href="reservations.php">
                             <i class="bi bi-bookmark-check me-2"></i>Mis Reservas
                         </a>
                     </li>
                     <li class="nav-item" id="adminMenu" style="display: none;">
-                        <a class="nav-link" href="admin.html">
+                        <a class="nav-link" href="admin.php">
                             <i class="bi bi-gear me-2"></i>Administración
                         </a>
                     </li>
@@ -145,7 +145,7 @@
                                     <i class="bi bi-clock-history me-2"></i>
                                     Reservas Recientes
                                 </h5>
-                                <a href="reservations.html" class="btn btn-outline-primary btn-sm">
+                                <a href="reservations.php" class="btn btn-outline-primary btn-sm">
                                     Ver Todas
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
@@ -174,21 +174,21 @@
                         </div>
                         <div class="card-body">
                             <div class="quick-actions">
-                                <a href="calendar.html" class="quick-action-btn primary">
+                                <a href="calendar.php" class="quick-action-btn primary">
                                     <div class="action-icon">
                                         <i class="bi bi-calendar-plus"></i>
                                     </div>
                                     <span>Nueva Reserva</span>
                                 </a>
                                 
-                                <a href="calendar.html" class="quick-action-btn secondary">
+                                <a href="calendar.php" class="quick-action-btn secondary">
                                     <div class="action-icon">
                                         <i class="bi bi-calendar3"></i>
                                     </div>
                                     <span>Ver Calendario</span>
                                 </a>
                                 
-                                <a href="reservations.html" class="quick-action-btn tertiary">
+                                <a href="reservations.php" class="quick-action-btn tertiary">
                                     <div class="action-icon">
                                         <i class="bi bi-list-ul"></i>
                                     </div>
