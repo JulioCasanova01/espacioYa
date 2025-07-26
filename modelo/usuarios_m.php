@@ -22,15 +22,28 @@ function login($conn, $data) {
             $rol = addslashes($_SESSION["rol"]);
             $mensaje = "Bienvenido";
 
-            echo "
-                <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
-                <script src='../vista/alertasweet/funcionesalert.js'></script>
-                <body>
-                    <script>
-                        informar('$mensaje', 'ACEPTAR', '../vista/dashboard.php', 'success');
-                    </script>
-                </body>";
-            exit();
+            if ($rol == "admin") {
+                $mensaje = "Bienvenido, Administrador $nombre";
+                echo "
+                    <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
+                    <script src='../vista/alertasweet/funcionesalert.js'></script>
+                    <body>
+                        <script>
+                            informar('$mensaje', 'ACEPTAR', '../vista/admin/admin.php', 'success');
+                        </script>
+                    </body>";
+                exit();
+            } elseif ($rol == "usuario") {
+                echo "
+                    <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
+                    <script src='../vista/alertasweet/funcionesalert.js'></script>
+                    <body>
+                        <script>
+                            informar('$mensaje', 'ACEPTAR', '../vista/dashboard.php', 'success');
+                        </script>
+                    </body>";
+                exit();
+            }
         } else {
             echo "
                 <script src='../vista/alertasweet/sweetalert2.all.min.js'></script>
@@ -137,6 +150,13 @@ function eliminar($conn, $id) {
    
     mysqli_query($conn, "DELETE FROM usuarios WHERE id=$id");
     header("Location: ../vista/admin/usuarios.php");
+}
+function logout() {
+    session_start();
+    session_unset();
+    session_destroy();
+    header("Location: ../vista/index.php");
+    exit();
 }
 
 function actualizar($conn, $data) {
