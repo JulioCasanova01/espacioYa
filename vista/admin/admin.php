@@ -1,3 +1,18 @@
+<?php 
+    session_start();
+    if (!isset($_SESSION['rol'])) {
+        header("Location: index.php");
+        exit();
+    }
+    if ($_SESSION['rol'] == 'usuario'):
+        header("Location: calendar.php");
+        exit();
+    endif;
+    include '../../conexion.php';
+    include '../../modelo/espacios_m.php';
+   $espacios = obtenerespacios($conn);
+    $totalEspacios = count($espacios);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,67 +23,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="../estilos/styles.css" rel="stylesheet">
+
 </head>
 <body class="dashboard-page">
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg modern-navbar">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <div class="brand-container">
-                    <div class="brand-icon">
-                        <i class="bi bi-calendar-check"></i>
-                    </div>
-                    <span class="brand-text">SpaceFlow</span>
-                    <span class="badge bg-warning ms-2">Admin</span>
-                </div>
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">
-                            <i class="bi bi-house-door me-2"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="calendar.php">
-                            <i class="bi bi-calendar3 me-2"></i>Calendario
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reservations.php">
-                            <i class="bi bi-bookmark-check me-2"></i>Mis Reservas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="admin.php">
-                            <i class="bi bi-gear me-2"></i>Administración
-                        </a>
-                    </li>
-                </ul>
-                
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle user-menu" href="#" role="button" data-bs-toggle="dropdown">
-                            <div class="user-avatar">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                            <span id="userNameNav" class="user-name"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end modern-dropdown">
-                            <li><a class="dropdown-item" href="#" onclick="logout()">
-                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                            </a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include 'navbar.php'; ?>
 
     <div class="main-content">
         <div class="container-fluid">
@@ -113,7 +72,9 @@
                                 <table class="table table-hover mb-0">
                                     <thead>
                                         <tr>
+                                            <th>ID</th>
                                             <th>Nombre</th>
+                                            <th>Descripción</th>
                                             <th>Capacidad</th>
                                             <th>Ubicación</th>
                                             <th>Estado</th>
@@ -121,17 +82,109 @@
                                         </tr>
                                     </thead>
                                     <tbody id="spacesTable">
-                                        <tr>
-                                            <td colspan="5" class="text-center py-5">
-                                                <div class="loading-spinner mx-auto mb-3"></div>
-                                                <p class="text-muted">Cargando espacios...</p>
-                                            </td>
-                                        </tr>
+
+                                        <?php if ($totalEspacios > 0): ?>
+                                            <?php foreach ($espacios as $espacio): ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($espacio['id']); ?></td>
+                                                    <td><?php echo htmlspecialchars($espacio['nombre']); ?></td>
+                                                    <td><?php echo htmlspecialchars($espacio['descripcion']); ?></td>
+                                                    <td><?php echo htmlspecialchars($espacio['capacidad']); ?></td>
+                                                    <td><?php echo htmlspecialchars($espacio['ubicacion']); ?></td>
+                                                    
+                                                    <td style="<?= $espacio['estado']=='activo' ? 'background-color:#28a745;color:#fff;padding:10px;border-radius:4px;text-align:center;' : ($espacio['estado']=='inactivo' ? 'background-color:#dc3545;color:#fff;padding:10px;border-radius:4px;text-align:center;' : '') ?>">
+                                                        <?= htmlspecialchars($espacio['estado']) ?>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" data-bs-target="#modaleditar<?= $espacio['id']; ?>" data-bs-toggle="modal">
+                                                            <i class="bi bi-pencil-square"></i> Editar
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="eliminar(event, <?php echo $espacio['id']; ?>)">
+                                                            <i class="bi bi-trash"></i> Eliminar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <div class="modal fade" id="modaleditar<?= $espacio['id']; ?>" tabindex="-1">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content modern-modal">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="spaceModalTitle">
+                                                                    <i class="bi bi-building me-2"></i>
+                                                                    Nuevo Espacio
+                                                                </h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form id="spaceForm" method="POST" action="../../controlador/espacios_c.php?accion=actualizar" class="modern-form">
+                                                                    <input type="hidden" id="spaceId" name="id" value="<?= $espacio['id']; ?>">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-floating mb-3">
+                                                                                <input type="text" value="<?= $espacio['nombre']; ?>" name="nombre" class="form-control modern-input" id="spaceName" required>
+                                                                                <label for="spaceName">
+                                                                                    <i class="bi bi-building me-2"></i>Nombre
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-floating mb-3">
+                                                                                <input name="capacidad" value="<?= $espacio['capacidad']; ?>" type="number" class="form-control modern-input" id="spaceCapacity" required>
+                                                                                <label for="spaceCapacity">
+                                                                                    <i class="bi bi-people me-2"></i>Capacidad
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="form-floating mb-3">
+                                                                        <input name="ubicacion" value="<?= $espacio['ubicacion']; ?>" type="text" class="form-control modern-input" id="spaceLocation" required>
+                                                                        <label for="spaceLocation">
+                                                                            <i class="bi bi-geo-alt me-2"></i>Ubicación
+                                                                        </label>
+                                                                    </div>
+                                                                    
+                                                                    <div class="form-floating mb-3">
+                                                                        <textarea name="descripcion" class="form-control modern-textarea" id="spaceDescription" rows="3"><?=$espacio['descripcion']; ?></textarea>
+                                                                        <label for="spaceDescription">
+                                                                            <i class="bi bi-chat-text me-2"></i>Descripción
+                                                                        </label>
+                                                                    </div>
+                                                                    
+                                                                    <div class="form-check">
+                                                                        <input type="hidden" name="estado" value="inactivo">
+                                                                        <input name="estado" value="activo" class="form-check-input" type="checkbox" id="spaceActive" <?= $espacio['estado'] == 'activo' ? 'checked' : '' ?>>
+                                                                        <label class="form-check-label" for="spaceActive">Espacio activo</label>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                        <button type="submit" class="btn btn-primary-gradient">
+                                                                            <i class="bi bi-check-circle me-2"></i>
+                                                                            Guardar
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                            
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                        <?php if ($totalEspacios == 0): ?>
+                                            <tr>
+                                                <td colspan="6" class="text-center">No hay espacios registrados.</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                        
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+
+                    
 
                     <!-- Reservations Tab -->
                     <div class="tab-pane fade" id="reservations" role="tabpanel">
@@ -316,13 +369,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="spaceForm" class="modern-form">
+                    <form id="spaceForm" method="POST" action="../../controlador/espacios_c.php?accion=registrar" class="modern-form">
                         <input type="hidden" id="spaceId">
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control modern-input" id="spaceName" required>
+                                    <input type="text" name="nombre" class="form-control modern-input" id="spaceName" required>
                                     <label for="spaceName">
                                         <i class="bi bi-building me-2"></i>Nombre
                                     </label>
@@ -330,7 +383,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input type="number" class="form-control modern-input" id="spaceCapacity" required>
+                                    <input name="capacidad" type="number" class="form-control modern-input" id="spaceCapacity" required>
                                     <label for="spaceCapacity">
                                         <i class="bi bi-people me-2"></i>Capacidad
                                     </label>
@@ -339,41 +392,36 @@
                         </div>
                         
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control modern-input" id="spaceLocation" required>
+                            <input name="ubicacion" type="text" class="form-control modern-input" id="spaceLocation" required>
                             <label for="spaceLocation">
                                 <i class="bi bi-geo-alt me-2"></i>Ubicación
                             </label>
                         </div>
                         
                         <div class="form-floating mb-3">
-                            <textarea class="form-control modern-textarea" id="spaceDescription" rows="3"></textarea>
+                            <textarea name="descripcion" class="form-control modern-textarea" id="spaceDescription" rows="3"></textarea>
                             <label for="spaceDescription">
                                 <i class="bi bi-chat-text me-2"></i>Descripción
                             </label>
                         </div>
                         
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control modern-input" id="spaceEquipment" placeholder="Ej: Proyector, WiFi, Aire acondicionado">
-                            <label for="spaceEquipment">
-                                <i class="bi bi-tools me-2"></i>Equipamiento
-                            </label>
-                        </div>
-                        
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="spaceActive" checked>
+                            <input name="estado" value="on" class="form-check-input" type="checkbox" id="spaceActive" checked>
                             <label class="form-check-label" for="spaceActive">
                                 Espacio activo
                             </label>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary-gradient" onclick="saveSpace()">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Guardar
+                            </button>
+                        </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary-gradient" onclick="saveSpace()">
-                        <i class="bi bi-check-circle me-2"></i>
-                        Guardar
-                    </button>
-                </div>
+                
+                
             </div>
         </div>
     </div>
@@ -384,12 +432,36 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/app.js"></script>
+    <script src="../alertasweet/sweetalert2.all.min.js"></script>
+    <script src="../alertasweet/funcionesalert.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
             checkAdminAccess();
             loadAdminData();
         });
+
+        async function eliminar(event, id) {
+            event.preventDefault();
+            const confirmarSalida = await confirmar(
+                '¿Estás seguro de que deseas eliminar esta CATEGORÍA?',
+                'SÍ', 'No', 'warning'
+            );
+
+            if (confirmarSalida) {
+                window.location.href = `../../controlador/espacios_c.php?accion=eliminar&id=${id}`;
+            }
+        }
+        async function salir() {
+            const confirmarSalida = await confirmar(
+                '¿Estás seguro de que deseas cerrar sesión?',
+                'SÍ', 'No', 'warning'
+            );
+
+            if (confirmarSalida) {
+                window.location.href = '../../controlador/usuarios_c.php?accion=salir';
+            }
+        }
     </script>
 </body>
 </html>

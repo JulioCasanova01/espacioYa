@@ -72,7 +72,7 @@ function salir(){
     session_start();
     session_unset();
     session_destroy();
-    header("Location: ../vista/login.php");
+    header("Location: ../vista/index.php");
     exit();
 }
 
@@ -150,13 +150,6 @@ function eliminar($conn, $id) {
    
     mysqli_query($conn, "DELETE FROM usuarios WHERE id=$id");
     header("Location: ../vista/admin/usuarios.php");
-}
-function logout() {
-    session_start();
-    session_unset();
-    session_destroy();
-    header("Location: ../vista/index.php");
-    exit();
 }
 
 function actualizar($conn, $data) {

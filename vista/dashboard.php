@@ -1,3 +1,14 @@
+<?php
+    session_start();
+    if (!isset($_SESSION['rol'])) {
+        header("Location: index.php");
+        exit();
+    }
+    if ($_SESSION['rol'] == 'admin'):
+        header("Location: admin/admin.php");
+        exit();
+    endif;
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,12 +24,13 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg modern-navbar">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="admin/admin.php">
                 <div class="brand-container">
                     <div class="brand-icon">
                         <i class="bi bi-calendar-check"></i>
                     </div>
                     <span class="brand-text">SpaceFlow</span>
+                    <span class="badge bg-warning ms-2">Admin</span>
                 </div>
             </a>
             
@@ -33,21 +45,7 @@
                             <i class="bi bi-house-door me-2"></i>Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="calendar.php">
-                            <i class="bi bi-calendar3 me-2"></i>Calendario
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reservations.php">
-                            <i class="bi bi-bookmark-check me-2"></i>Mis Reservas
-                        </a>
-                    </li>
-                    <li class="nav-item" id="adminMenu" style="display: none;">
-                        <a class="nav-link" href="admin.php">
-                            <i class="bi bi-gear me-2"></i>Administración
-                        </a>
-                    </li>
+                
                 </ul>
                 
                 <ul class="navbar-nav">
@@ -58,10 +56,11 @@
                             </div>
                             <span id="userNameNav" class="user-name"></span>
                         </a>
+                        
                         <ul class="dropdown-menu dropdown-menu-end modern-dropdown">
-                            <li><a class="dropdown-item" href="#" onclick="logout()">
-                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                            </a></li>
+                            <li><button class="dropdown-item" href="index.php" onclick="salir()">
+                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</button>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -225,11 +224,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/app.js"></script>
+    <script src="alertasweet/sweetalert2.all.min.js"></script>
+    <script src="alertasweet/funcionesalert.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
             loadDashboard();
         });
+        
+        async function salir() {
+            const confirmarSalida = await confirmar(
+                '¿Estás seguro de que deseas cerrar sesión?',
+                'SÍ', 'No', 'warning'
+            );
+
+            if (confirmarSalida) {
+                window.location.href = '../controlador/usuarios_c.php?accion=salir';
+            }
+        }
     </script>
 </body>
 </html>
